@@ -19,5 +19,7 @@ void loop() {
 
 void processData(String key, String value) {
     Serial.println("Datos recibidos:");
-    Serial.println(key);
+    Serial.print(key);
+    Serial.print(" = ");
+    Serial.println(value);
 }
