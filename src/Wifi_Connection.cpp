@@ -1,16 +1,17 @@
 #include <Arduino.h>
-#include <WiFi.h> // Asegúrate de incluir la biblioteca WiFi
-
+#include <WiFi.h>
+#include <ESPAsyncWebServer.h>
 #include "Wifi_Connection.h"
 
-WiFiServer server(80);  // Inicializa server como variable global
+AsyncWebServer server(80);
 
+// Declaración del puntero a función
+void (*processDataCallback)(String key, String value);
 
-/* WiFi connected.
-IP address: 
-192.168.20.72 */
+void wifiConection(const char* ssid, const char* password, void (*callback)(String key, String value)) {
+    // Guarda el puntero a la función processData
+    processDataCallback = callback;
 
-void wifiConection(const char* ssid, const char* password) {
     WiFi.begin(ssid, password);
 
     while (WiFi.status() != WL_CONNECTED) {
@@ -22,9 +23,21 @@ void wifiConection(const char* ssid, const char* password) {
     Serial.println(WiFi.localIP());
 
     // Enciende un LED de prueba (conectado al pin 13, por ejemplo)
-    pinMode(13, OUTPUT);
-    digitalWrite(13, HIGH); // Enciende el LED
+    pinMode(LED_BUILTIN, OUTPUT);
+    digitalWrite(LED_BUILTIN, HIGH);  
 
-    // Inicia el servidor web en el puerto 80
+    // Configura las rutas HTTP
+    server.on("/", HTTP_POST, [](AsyncWebServerRequest *request){
+        String key = request->arg("key");
+        String value = request->arg("value");
+        
+        // Llama a la función de callback con la clave y el valor
+        processDataCallback(key, value);
+
+        request->send(200, "text/plain", "Datos recibidos");
+    });
+
+
+    // Inicia el servidor web
     server.begin();
 }
