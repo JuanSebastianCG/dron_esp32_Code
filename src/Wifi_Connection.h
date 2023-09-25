@@ -3,11 +3,11 @@
 
 #include <Arduino.h>
 #include <WiFi.h>
-#include <ESPAsyncWebServer.h>
+#include <WiFiUdp.h>
 
-extern AsyncWebServer server;
-extern WiFiClient client;
+extern WiFiUDP udpServer;
 
-void wifiConection(const char* ssid, const char* password, void (*callback)(String key, String value));
+void wifiConnection(const char* ssid, const char* password, void (*callback)(String key, String value));
+void processUDPData();
 
 #endif

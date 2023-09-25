@@ -1,43 +1,49 @@
 #include <Arduino.h>
 #include <WiFi.h>
-#include <ESPAsyncWebServer.h>
-#include "Wifi_Connection.h"
+#include <WiFiUdp.h>
 
-AsyncWebServer server(80);
+WiFiUDP udpServer;
 
-// Declaración del puntero a función
 void (*processDataCallback)(String key, String value);
 
-void wifiConection(const char* ssid, const char* password, void (*callback)(String key, String value)) {
-    // Guarda el puntero a la función processData
+void wifiConnection(const char* ssid, const char* password, void (*callback)(String key, String value)) {
     processDataCallback = callback;
-
     WiFi.begin(ssid, password);
 
+    // Espera hasta que se establezca la conexión Wi-Fi
+    int attempts = 0;
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
+        if (++attempts > 10) {
+            Serial.println("Error: No se pudo conectar a la red Wi-Fi");
+            ESP.restart();
+        }
     }
 
-    Serial.println("WiFi connected.");
-    Serial.println("IP address: ");
-    Serial.println(WiFi.localIP());
-
-    // Enciende un LED de prueba (conectado al pin 13, por ejemplo)
     pinMode(LED_BUILTIN, OUTPUT);
-    digitalWrite(LED_BUILTIN, HIGH);  
+    digitalWrite(LED_BUILTIN, HIGH);
+    Serial.println("WiFi connected.");
+    Serial.print("IP address: ");
+    Serial.println(WiFi.localIP());
+    
 
-    // Configura las rutas HTTP
-    server.on("/", HTTP_POST, [](AsyncWebServerRequest *request){
-        String key = request->arg("key");
-        String value = request->arg("value");
+    // Configura el servidor UDP en el puerto 12345 (o el que desees)
+    udpServer.begin(12345);
+}
+
+void processUDPData() {
+    int packetSize = udpServer.parsePacket();
+    if (packetSize) {
+        char packetData[packetSize + 1];
+        udpServer.read(packetData, packetSize);
+        packetData[packetSize] = '\0';
         
-        // Llama a la función de callback con la clave y el valor
-        processDataCallback(key, value);
-
-        request->send(200, "text/plain", "Datos recibidos");
-    });
-
-
-    // Inicia el servidor web
-    server.begin();
+        String dataString(packetData);
+        int separatorIndex = dataString.indexOf('=');
+        if (separatorIndex != -1) {
+            String key = dataString.substring(0, separatorIndex);
+            String value = dataString.substring(separatorIndex + 1);
+            processDataCallback(key, value);
+        }
+    }
 }
