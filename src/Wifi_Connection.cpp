@@ -3,10 +3,11 @@
 #include <WiFiUdp.h>
 
 WiFiUDP udpServer;
+const int8_t port = 80; 
 
-void (*processDataCallback)(String key, String value);
+void (*processDataCallback)(uint8_t key, int16_t value);
 
-void wifiConnection(const char* ssid, const char* password, void (*callback)(String key, String value)) {
+void wifiConnection(const char* ssid, const char* password, void (*callback)(uint8_t key, int16_t value)) {
     processDataCallback = callback;
     WiFi.begin(ssid, password);
 
@@ -24,26 +25,41 @@ void wifiConnection(const char* ssid, const char* password, void (*callback)(Str
     digitalWrite(LED_BUILTIN, HIGH);
     Serial.println("WiFi connected.");
     Serial.print("IP address: ");
-    Serial.println(WiFi.localIP());
+    Serial.print(WiFi.localIP());
+    Serial.print(" port: ");
+    Serial.println(port);
     
-
     // Configura el servidor UDP en el puerto 12345 (o el que desees)
-    udpServer.begin(12345);
+    udpServer.begin(port);
 }
+
 
 void processUDPData() {
     int packetSize = udpServer.parsePacket();
-    if (packetSize) {
-        char packetData[packetSize + 1];
-        udpServer.read(packetData, packetSize);
-        packetData[packetSize] = '\0';
+    if (packetSize >= sizeof(uint8_t) + sizeof(int16_t)) {
+       
+        uint8_t key;
+        int16_t value;
         
-        String dataString(packetData);
-        int separatorIndex = dataString.indexOf('=');
-        if (separatorIndex != -1) {
-            String key = dataString.substring(0, separatorIndex);
-            String value = dataString.substring(separatorIndex + 1);
-            processDataCallback(key, value);
-        }
+        uint8_t buffer[sizeof(uint8_t) + sizeof(int16_t)];
+        udpServer.read(buffer, sizeof(buffer));
+        // El primer byte es uint8
+        key = buffer[0];  
+        value = (int16_t)((buffer[1] << 8) | buffer[2]);  // Los siguientes 2 bytes son int16
+        
+        processDataCallback(key, value);
     }
 }
+
+
+/* void processUDPData() {
+    int packetSize = udpServer.parsePacket();
+    if (packetSize >= sizeof(uint8_t) + sizeof(int16_t)) {
+        
+        uint8_t buffer[sizeof(uint8_t) + sizeof(int16_t)];
+        udpServer.read(buffer, sizeof(buffer));
+        
+        processDataCallback(buffer[0], *((buffer + sizeof(int16_t))));
+    }
+}
+ */
