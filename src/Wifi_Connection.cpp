@@ -5,9 +5,9 @@
 WiFiUDP udpServer;
 const int8_t port = 80; 
 
-void (*processDataCallback)(uint8_t key, int16_t value);
+void (*processDataCallback)(uint8_t key, int16_t value1, int16_t value2);
 
-void wifiConnection(const char* ssid, const char* password, void (*callback)(uint8_t key, int16_t value)) {
+void wifiConnection(const char* ssid, const char* password, void (*callback)(uint8_t key, int16_t value1, int16_t value2)) {
     processDataCallback = callback;
     WiFi.begin(ssid, password);
 
@@ -36,30 +36,17 @@ void wifiConnection(const char* ssid, const char* password, void (*callback)(uin
 
 void processUDPData() {
     int packetSize = udpServer.parsePacket();
-    if (packetSize >= sizeof(uint8_t) + sizeof(int16_t)) {
-       
+    if (packetSize >= sizeof(uint8_t) + 2 * sizeof(int16_t)) {
         uint8_t key;
-        int16_t value;
+        int16_t value1, value2;
         
-        uint8_t buffer[sizeof(uint8_t) + sizeof(int16_t)];
+        uint8_t buffer[sizeof(uint8_t) + 2 * sizeof(int16_t)];
         udpServer.read(buffer, sizeof(buffer));
-        // El primer byte es uint8
-        key = buffer[0];  
-        value = (int16_t)((buffer[1] << 8) | buffer[2]);  // Los siguientes 2 bytes son int16
+
+        key = buffer[0];
+        value1 = (int16_t)((buffer[1] << 8) | buffer[2]);  // Los siguientes 2 bytes son int16
+        value2 = (int16_t)((buffer[3] << 8) | buffer[4]);  // Los siguientes 2 bytes son int16
         
-        processDataCallback(key, value);
+        processDataCallback(key, value1, value2);
     }
 }
-
-
-/* void processUDPData() {
-    int packetSize = udpServer.parsePacket();
-    if (packetSize >= sizeof(uint8_t) + sizeof(int16_t)) {
-        
-        uint8_t buffer[sizeof(uint8_t) + sizeof(int16_t)];
-        udpServer.read(buffer, sizeof(buffer));
-        
-        processDataCallback(buffer[0], *((buffer + sizeof(int16_t))));
-    }
-}
- */
