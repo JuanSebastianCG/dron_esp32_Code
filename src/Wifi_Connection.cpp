@@ -21,8 +21,6 @@ void wifiConnection(const char* ssid, const char* password, void (*callback)(uin
         }
     }
 
-    pinMode(LED_BUILTIN, OUTPUT);
-    digitalWrite(LED_BUILTIN, HIGH);
     Serial.println("WiFi connected.");
     Serial.print("IP address: ");
     Serial.print(WiFi.localIP());
@@ -36,6 +34,8 @@ void wifiConnection(const char* ssid, const char* password, void (*callback)(uin
 
 void processUDPData() {
     int packetSize = udpServer.parsePacket();
+
+
     if (packetSize >= sizeof(uint8_t) + 2 * sizeof(int16_t)) {
         uint8_t key;
         int16_t value1, value2;
