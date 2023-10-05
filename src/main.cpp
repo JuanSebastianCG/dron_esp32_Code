@@ -28,7 +28,7 @@ void setup()
     connectMPU6050(readSensor);
 
     // wifiConnection("ANPARO..", "24280650", processData);
-    // Serial.println("WiFi connected.");
+    // 
 }
 
 void loop()
@@ -45,7 +45,22 @@ void loop()
 void readSensor(sensors_event_t a, sensors_event_t g, sensors_event_t temp)
 {
 
+    Serial.print("Acceleration X: ");
+    Serial.print(a.acceleration.x);
+    Serial.print(", Y: ");
+    Serial.print(a.acceleration.y);
+    Serial.print(", Z: ");
+    Serial.print(a.acceleration.z);
+    Serial.println(" m/s^2");
 
+    /* Serial.print("Rotation X: ");   
+    Serial.print(g.gyro.x);
+    Serial.print(", Y: ");
+    Serial.print(g.gyro.y);
+    Serial.print(", Z: ");
+    Serial.print(g.gyro.z);
+    Serial.println(" rad/s"); */
+    
     /* int servoPosition = map(a.acceleration.x ,-10, 10, 0, 180);
     servoMotor1.write(servoPosition);
 

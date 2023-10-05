@@ -19,6 +19,10 @@ void connectMPU6050( void (*callback)(sensors_event_t a, sensors_event_t g, sens
   }
   Serial.println("MPU6050 Found!");
 
+  mpu.setAccelerometerRange(MPU6050_RANGE_4_G);
+  mpu.setGyroRange(MPU6050_RANGE_1000_DEG);
+  mpu.setFilterBandwidth(MPU6050_BAND_44_HZ);//21Hz
+
   mpu.setHighPassFilter(MPU6050_HIGHPASS_0_63_HZ);
   mpu.setMotionDetectionThreshold(1);
   mpu.setMotionDetectionDuration(20);
@@ -28,9 +32,9 @@ void connectMPU6050( void (*callback)(sensors_event_t a, sensors_event_t g, sens
 }
 
 void readMPU6050() {
-  if(mpu.getMotionInterruptStatus()) {
+  //if(mpu.getMotionInterruptStatus()) {
     sensors_event_t a, g, temp;
     mpu.getEvent(&a, &g, &temp);
     sensors_eventCallBack(a, g, temp);
-  }
+  //}
 }
