@@ -1,73 +1,41 @@
 #include <Arduino.h>
-#include <ESP32Servo.h>
 
-#include "Wifi_Connection.h"
-#include "Mpu_6050_Conection.h"
+// Definición de pines para el motor
+#define MOTOR_PIN1 15
+#define MOTOR_PIN2 13
+#define MOTOR_PIN3 32
+#define MOTOR_PIN4 19
 
-#define SERVO_PIN1 15 // ESP32 pin GPIO26 connected to servo motor
-#define SERVO_PIN2 2  // ESP32 pin GPIO26 connected to servo motor
-#define SERVO_PIN3 4  // ESP32 pin GPIO26 connected to servo motor
+void setup() {
+  Serial.begin(115200);
+  
+  // Configura los pines como salidas
+  pinMode(MOTOR_PIN1, OUTPUT);
+  pinMode(MOTOR_PIN2, OUTPUT);
+  pinMode(MOTOR_PIN3, OUTPUT);
+  pinMode(MOTOR_PIN4, OUTPUT);
 
-Servo servoMotor1;
-Servo servoMotor2;
-Servo servoMotor3;
+  // Establece el valor de PWM en 255 para los pines del motor
 
-// void processData(uint8_t key, int16_t value1, int16_t value2);}
-void readSensor(sensors_event_t a, sensors_event_t g, sensors_event_t temp);
-
-void setup()
-{
-    Serial.begin(115200);
-    delay(1000);
-    Serial.println("Starting...");
-
-    servoMotor1.attach(SERVO_PIN1);
-    servoMotor2.attach(SERVO_PIN2);
-    servoMotor3.attach(SERVO_PIN3);
-
-    connectMPU6050(readSensor);
-
-    // wifiConnection("ANPARO..", "24280650", processData);
-    // 
-}
-
-void loop()
-{
-    readMPU6050();
-    //processUDPData();
 
 }
+int i = 0;
+void loop() {
 
-/* void processData(uint8_t key, int16_t value1, int16_t value2)
-{
-} */
 
-void readSensor(sensors_event_t a, sensors_event_t g, sensors_event_t temp)
-{
 
-    Serial.print("Acceleration X: ");
-    Serial.print(a.acceleration.x);
-    Serial.print(", Y: ");
-    Serial.print(a.acceleration.y);
-    Serial.print(", Z: ");
-    Serial.print(a.acceleration.z);
-    Serial.println(" m/s^2");
+  analogWrite(MOTOR_PIN1, i);
+  analogWrite(MOTOR_PIN2, i);
+  Serial.println(i++);
+  if (i > 255) {
+    i = 0;
+  }
 
-    /* Serial.print("Rotation X: ");   
-    Serial.print(g.gyro.x);
-    Serial.print(", Y: ");
-    Serial.print(g.gyro.y);
-    Serial.print(", Z: ");
-    Serial.print(g.gyro.z);
-    Serial.println(" rad/s"); */
-    
-    /* int servoPosition = map(a.acceleration.x ,-10, 10, 0, 180);
-    servoMotor1.write(servoPosition);
 
-    int servoPositio1 = map(a.acceleration.y, -10, 10, 0, 180);
-    servoMotor1.write(servoPositio1);
+  analogWrite(MOTOR_PIN3, 255);
+  analogWrite(MOTOR_PIN4, 255);
+  delay(100);
+  Serial.println(i);
 
-    int servoPosition2 = map(a.acceleration.z, -10, 10, 0, 180);
-    servoMotor1.write(servoPosition2 */
-
+  // El motor se mantendrá funcionando a velocidad máxima (255) de manera continua
 }

@@ -36,5 +36,7 @@ void readMPU6050() {
     sensors_event_t a, g, temp;
     mpu.getEvent(&a, &g, &temp);
     sensors_eventCallBack(a, g, temp);
+   //if error reading connectMpu Again
+  
   //}
 }
