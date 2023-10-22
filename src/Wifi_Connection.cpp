@@ -1,9 +1,13 @@
 #include <Arduino.h>
 #include <WiFi.h>
 #include <WiFiUdp.h>
+#include "main.h"
 
 WiFiUDP udpServer;
-const int8_t port = 80; 
+
+
+
+
 
 void (*processDataCallback)(uint8_t key, int16_t value1, int16_t value2);
 
