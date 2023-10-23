@@ -3,6 +3,7 @@
 #include "Wifi_Connection.h"
 #include "Mpu_6050_Conection.h"
 #include "Motor_Controller.h"
+#include <Wire.h>
 
 // Initialize timing variables
 const unsigned long period = 500; // 500 milliseconds
@@ -17,6 +18,7 @@ void procesUdp(uint8_t key, int16_t value1, int16_t value2);
 
 void setup() {
   Serial.begin(115200);
+  Wire.begin();
 
   // Connect to Wi-Fi
   //wifiConnection("ssid", "password", procesUdp);
@@ -36,6 +38,10 @@ void loop() {
 
   // Read MPU6050 data
   readMPU6050();
+
+  readMpuMotion();
+
+  calculateOrientation();
 
   //mover los motores
   moveMotors();

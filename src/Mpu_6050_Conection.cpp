@@ -1,11 +1,46 @@
 #include "Mpu_6050_Conection.h"
 #include <Adafruit_MPU6050.h>
 #include <Adafruit_Sensor.h>
-#include <Wire.h>
+
+int16_t ax, ay, az, gx, gy, gz;
+float ypr[3];
 
 Adafruit_MPU6050 mpu;
 void (*sensors_eventCallBack)(sensors_event_t a, sensors_event_t g, sensors_event_t temp);
 void readMPU6050();
+void readMpuMotion();
+void calculateOrientation();
+
+void readMpuMotion() {
+  sensors_event_t a, g, temp;
+  mpu.getEvent(&a, &g, &temp);
+  ax = static_cast<int16_t>(a.acceleration.x);
+  ay = static_cast<int16_t>(a.acceleration.y);
+  az = static_cast<int16_t>(a.acceleration.z);
+
+  gx = static_cast<int16_t>(g.gyro.x);
+  gy = static_cast<int16_t>(g.gyro.y);
+  gz = static_cast<int16_t>(g.gyro.z);
+}
+
+void calculateOrientation() {
+  float pitch, roll, yaw;
+  readMpuMotion();
+  pitch = atan2(ay, sqrt(ax * ax + az * az)) * 180 / PI;
+  roll = atan2(-ax, az) * 180 / PI;
+  yaw = atan2(az, sqrt(ax * ax + az * az)) * 180 / PI;
+  ypr[0] = yaw;
+  ypr[1] = pitch;
+  ypr[2] = roll;
+
+  //Print values for plotter
+  Serial.print("yaw:");
+  Serial.print(yaw);
+  Serial.print(", pitch:");
+  Serial.print(pitch);
+  Serial.print(", roll:");
+  Serial.println(roll);
+}
 
 void connectMPU6050( void (*callback)(sensors_event_t a, sensors_event_t g, sensors_event_t temp)) {
   
