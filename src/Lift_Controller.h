@@ -2,10 +2,8 @@
 #define LIFT_CONTROLLER_H
 #include <Arduino.h>
 
-
-int minLimitMotor = 0;
-int maxLimitMotor = 155;
+extern uint8_t minLimitMotor ;
+extern uint8_t maxLimitMotor ;
 
 
 #endif
-

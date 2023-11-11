@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <PID_v1.h>
+#include "Lift_Controller.h"
 
 void controllBalance(float y, float x);
 void moveMotorsXbox(uint8_t key, int16_t value1, int16_t value2);
@@ -14,17 +15,17 @@ void setupMotors();
 #define MOTOR_PIN4 19
 
 // Define channels and PWM settings
-const int channel1 = 0;
-const int channel2 = 1;
-const int channel3 = 2;
-const int channel4 = 3;
+const uint8_t channel1 = 0;
+const uint8_t channel2 = 1;
+const uint8_t channel3 = 2;
+const uint8_t channel4 = 3;
 
-const int frequency = 5000;
-const int resolution = 8;
+const uint32_t frequency = 5000;
+const uint8_t resolution = 8;
 
 //====================pid===================
 
-const float Kp = 2.0, Ki = 0.01, Kd = 0.001; // Increase Kp
+const float Kp = 2.0, Ki = 0.01, Kd = 0.001; // Tuning constants for PID control
 float stableYSetPoint = 0.4;                 // Set the setpoint to 0
 
 double Setpoint1 = stableYSetPoint, Input1, Output1;
@@ -58,9 +59,9 @@ int yEvaluate = 0;
 
 //============================== functions =============================
 
-const float responsePID = 0.01;
 void setupMotors()
 {
+  const float responsePID = 0.01;
 
   // Set up PWM for motor control
   ledcSetup(channel1, frequency, resolution);
@@ -110,10 +111,10 @@ void controllBalance(float y, float x)
      motorSpeed4 = (maxLimitMotor + minLimitMotor) - map(Output4, minInputPID, maxInputPID, minLimitMotor, maxLimitMotor) + 120;
      motorSpeed3 = map(Output3, minInputPID, maxInputPID, minLimitMotor, maxLimitMotor) + 120; */
 
-    motorSpeed1 = 255;
-    motorSpeed2 = 255;
-    motorSpeed3 = 255;
-    motorSpeed4 = 255;
+    motorSpeed1 = maxLimitMotor;
+    motorSpeed2 = maxLimitMotor;
+    motorSpeed3 = maxLimitMotor;
+    motorSpeed4 = maxLimitMotor;
   }
   else
   {
@@ -136,13 +137,13 @@ void moveMotors()
 //============================XBox Controller============================
 void moveMotorsXbox(uint8_t key, int16_t value1, int16_t value2)
 {
-  // Serial.print(key);
-  yEvaluate = map(value1, -32768, 32767, -100, 100);
   Serial.println(key);
+  yEvaluate = map(value1, -32768, 32767, -100, 100);
   if (key == 1)
     stabilize = !stabilize;
 
   if (key == 16 || key == 15)
   {
+    maxLimitMotor = map(value2, -32768, 32767, 0, 255);
   }
 }
