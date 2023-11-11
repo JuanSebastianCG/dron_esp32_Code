@@ -5,11 +5,11 @@
 
 WiFiUDP udpServer;
 
-
-
-
-
 void (*processDataCallback)(uint8_t key, int16_t value1, int16_t value2);
+
+uint8_t lastControllKey = 0;
+int16_t lastControllValue1 = 0;
+int16_t lastControllValue2 = 0;
 
 void wifiConnection(const char* ssid, const char* password, void (*callback)(uint8_t key, int16_t value1, int16_t value2)) {
     processDataCallback = callback;
@@ -38,8 +38,6 @@ void wifiConnection(const char* ssid, const char* password, void (*callback)(uin
 
 void processUDPData() {
     int packetSize = udpServer.parsePacket();
-
-
     if (packetSize >= sizeof(uint8_t) + 2 * sizeof(int16_t)) {
         uint8_t key;
         int16_t value1, value2;
