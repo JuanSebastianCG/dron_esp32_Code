@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <PID_v1.h>
 #include "Lift_Controller.h"
+#include "WarningDetection.h"
 
 void controllBalance(float y, float x);
 void moveMotorsXbox(uint8_t key, int16_t value1, int16_t value2);
@@ -95,6 +96,10 @@ void controllBalance(float y, float x)
 {
   if (stabilize)
   {
+
+    if (getActualWarningColor() != 2)
+      warningLed(2);
+
     Input1 = yEvaluate;
     Input2 = yEvaluate;
     Input3 = yEvaluate;
@@ -118,6 +123,10 @@ void controllBalance(float y, float x)
   }
   else
   {
+    if (getActualWarningColor() == 2)
+      warningLed(5);
+    
+
     motorSpeed1 = 0;
     motorSpeed2 = 0;
     motorSpeed3 = 0;
