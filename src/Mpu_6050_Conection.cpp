@@ -35,6 +35,7 @@ void readMPU6050() {
   //if(mpu.getMotionInterruptStatus()) {
     sensors_event_t a, g, temp;
     mpu.getEvent(&a, &g, &temp);
+
     sensors_eventCallBack(a, g, temp);
    //if error reading connectMpu Again
   

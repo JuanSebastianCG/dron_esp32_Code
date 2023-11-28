@@ -14,11 +14,8 @@ void setupWarningLed()
     pinMode(LEDG, OUTPUT);
     pinMode(LEDB, OUTPUT);
     pinMode(LEDW, OUTPUT);
-    pinMode(LED_BUILTIN, OUTPUT);
 
-    // Ensure LED_BUILTIN is turned off
-    pinMode(LED_BUILTIN, OUTPUT);
-    digitalWrite(LED_BUILTIN, LOW);
+    digitalWrite(LEDW, HIGH);
 }
 
 //------------------

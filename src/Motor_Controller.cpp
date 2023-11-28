@@ -7,6 +7,7 @@ void controllBalance(float y, float x);
 void moveMotorsXbox(uint8_t key, int16_t value1, int16_t value2);
 void moveMotors();
 void setupMotors();
+
 //=======================PWM===================
 
 // Define pins for the motors
@@ -24,26 +25,46 @@ const uint8_t channel4 = 3;
 const uint32_t frequency = 5000;
 const uint8_t resolution = 8;
 
-//====================pid===================
+const float Kp = 2.0, Ki = 0.01, Kd = 0.1; 
+//====================pidy===================
 
-const float Kp = 2.0, Ki = 0.01, Kd = 0.001; // Tuning constants for PID control
 float stableYSetPoint = 0.4;                 // Set the setpoint to 0
 
-double Setpoint1 = stableYSetPoint, Input1, Output1;
-float Kp1 = Kp, Ki1 = Ki, Kd1 = Kd;
-PID pid1(&Input1, &Output1, &Setpoint1, Kp1, Ki1, Kd1, DIRECT);
+double Setpointy1 = stableYSetPoint, Inputy1, Outputy1;
+float Kpy1 = Kp, Kiy1 = Ki, Kdy1 = Kd;
+PID pid1(&Inputy1, &Outputy1, &Setpointy1, Kpy1, Kiy1, Kdy1, DIRECT);
 
-double Setpoint2 = stableYSetPoint, Input2, Output2;
-float Kp2 = Kp, Ki2 = Ki, Kd2 = Kd;
-PID pid2(&Input2, &Output2, &Setpoint2, Kp2, Ki2, Kd2, DIRECT);
+double Setpointy2 = stableYSetPoint, Inputy2, Outputy2;
+float Kpy2 = Kp, Kiy2 = Ki, Kdy2 = Kd;
+PID pid2(&Inputy2, &Outputy2, &Setpointy2, Kpy2, Kiy2, Kdy2, DIRECT);
 
-double Setpoint3 = stableYSetPoint, Input3, Output3;
-float Kp3 = Kp, Ki3 = Ki, Kd3 = Kd;
-PID pid3(&Input3, &Output3, &Setpoint3, Kp3, Ki3, Kd3, DIRECT);
+double Setpointy3 = stableYSetPoint, Inputy3, Outputy3;
+float Kpy3 = Kp, Kiy3 = Ki, Kdy3 = Kd;
+PID pid3(&Inputy3, &Outputy3, &Setpointy3, Kpy3, Kiy3, Kdy3, DIRECT);
 
-double Setpoint4 = stableYSetPoint, Input4, Output4;
-float Kp4 = Kp, Ki4 = Ki, Kd4 = Kd;
-PID pid4(&Input4, &Output4, &Setpoint4, Kp4, Ki4, Kd4, DIRECT);
+double Setpointy4 = stableYSetPoint, Inputy4, Outputy4;
+float Kpy4 = Kp, Kiy4 = Ki, Kdy4 = Kd;
+PID pid4(&Inputy4, &Outputy4, &Setpointy4, Kpy4, Kiy4, Kdy4, DIRECT);
+
+//===================pidx========================
+
+float stableXSetPoint = 0.4;                 // Set the setpoint to 0
+
+double Setpointx1 = stableXSetPoint, Inputx1, Outputx1;
+float Kpx1 = Kp, Kix1 = Ki, Kdx1 = Kd;
+PID pid5(&Inputx1, &Outputx1, &Setpointx1, Kpx1, Kix1, Kdx1, DIRECT);
+
+double Setpointx2 = stableXSetPoint, Inputx2, Outputx2;
+float Kpx2 = Kp, Kix2 = Ki, Kdx2 = Kd;
+PID pid6(&Inputx2, &Outputx2, &Setpointx2, Kpx2, Kix2, Kdx2, DIRECT);
+
+double Setpointx3 = stableXSetPoint, Inputx3, Outputx3;
+float Kpx3 = Kp, Kix3 = Ki, Kdx3 = Kd;
+PID pid7(&Inputx3, &Outputx3, &Setpointx3, Kpx3, Kix3, Kdx3, DIRECT);
+
+double Setpointx4 = stableXSetPoint, Inputx4, Outputx4;
+float Kpx4 = Kp, Kix4 = Ki, Kdx4 = Kd;
+PID pid8(&Inputx4, &Outputx4, &Setpointx4, Kpx4, Kix4, Kdx4, DIRECT);
 
 //============================== const =============================
 
@@ -68,11 +89,11 @@ void setupMotors()
   ledcSetup(channel1, frequency, resolution);
   ledcAttachPin(MOTOR_PIN1, channel1);
   ledcSetup(channel2, frequency, resolution);
-  ledcAttachPin(MOTOR_PIN4, channel2);
+  ledcAttachPin(MOTOR_PIN2, channel2);
   ledcSetup(channel3, frequency, resolution);
   ledcAttachPin(MOTOR_PIN3, channel3);
   ledcSetup(channel4, frequency, resolution);
-  ledcAttachPin(MOTOR_PIN2, channel4);
+  ledcAttachPin(MOTOR_PIN4, channel4);
 
   // Initialize PID controllers
   pid1.SetMode(AUTOMATIC);
@@ -90,52 +111,70 @@ void setupMotors()
   pid4.SetMode(AUTOMATIC);
   pid4.SetSampleTime(responsePID);
   pid4.SetOutputLimits(minInputPID, maxInputPID);
+
+  pid5.SetMode(AUTOMATIC);
+  pid5.SetSampleTime(responsePID);
+  pid5.SetOutputLimits(minInputPID, maxInputPID);
+
+  pid6.SetMode(AUTOMATIC);
+  pid6.SetSampleTime(responsePID);
+  pid6.SetOutputLimits(minInputPID, maxInputPID);
+
+  pid7.SetMode(AUTOMATIC);
+  pid7.SetSampleTime(responsePID);
+  pid7.SetOutputLimits(minInputPID, maxInputPID);
+
+  pid8.SetMode(AUTOMATIC);
+  pid8.SetSampleTime(responsePID);
+  pid8.SetOutputLimits(minInputPID, maxInputPID);
 }
 
 void controllBalance(float y, float x)
 {
   if (stabilize)
   {
+    // Read MPU6050 data
+    Inputy1 = y;
+    Inputy2 = y;
+    Inputy3 = y;
+    Inputy4 = y;
 
-    if (getActualWarningColor() != 2)
-      warningLed(2);
-
-    Input1 = yEvaluate;
-    Input2 = yEvaluate;
-    Input3 = yEvaluate;
-    Input4 = yEvaluate;
+    Inputx1 = x;
+    Inputx2 = x;
+    Inputx3 = x;
+    Inputx4 = x;
 
     pid1.Compute();
     pid2.Compute();
     pid3.Compute();
     pid4.Compute();
+  
+    pid5.Compute();
+    pid6.Compute();
+    pid7.Compute();
+    pid8.Compute();
 
     // Ajustar la velocidad del motor 1 proporcionalmente a "Output1"
-    /*  motorSpeed1 = (maxLimitMotor + minLimitMotor) - map(Output1, minInputPID, maxInputPID, minLimitMotor, maxLimitMotor) + 120;
-     motorSpeed2 = map(Output2, minInputPID, maxInputPID, minLimitMotor, maxLimitMotor) + 120;
-     motorSpeed4 = (maxLimitMotor + minLimitMotor) - map(Output4, minInputPID, maxInputPID, minLimitMotor, maxLimitMotor) + 120;
-     motorSpeed3 = map(Output3, minInputPID, maxInputPID, minLimitMotor, maxLimitMotor) + 120; */
+    
+     motorSpeed1 = map(Outputy1+Outputx1*-1+heightWanted, -255, 255, 0, 255);
+     motorSpeed2 = map(Outputy2+Outputx2+heightWanted, -255, 255, 0, 255);
+      motorSpeed3 = map(Outputy3*-1+Outputx3+heightWanted, -255, 255, 0, 255);
+      motorSpeed4 = map(Outputy4*-1+Outputx4*-1+heightWanted, -255, 255, 0, 255);
+   
 
-    motorSpeed1 = maxLimitMotor;
-    motorSpeed2 = maxLimitMotor;
-    motorSpeed3 = maxLimitMotor;
-    motorSpeed4 = maxLimitMotor;
   }
   else
   {
-    if (getActualWarningColor() == 2)
-      warningLed(5);
-    
-
     motorSpeed1 = 0;
     motorSpeed2 = 0;
     motorSpeed3 = 0;
     motorSpeed4 = 0;
   }
-  // printf("Motor 1: %d, Motor 2: %d, y: %f\n", motorSpeed1, motorSpeed2, y);
+   printf("Motor 1: %d, Motor 2: %d, Motor 3: %d, Motor 4: %d\n", motorSpeed1, motorSpeed2, motorSpeed3, motorSpeed4);
 }
 
 void moveMotors()
+
 {
   ledcWrite(channel1, motorSpeed1);
   ledcWrite(channel2, motorSpeed2);
@@ -146,13 +185,16 @@ void moveMotors()
 //============================XBox Controller============================
 void moveMotorsXbox(uint8_t key, int16_t value1, int16_t value2)
 {
-  Serial.println(key);
   yEvaluate = map(value1, -32768, 32767, -100, 100);
-  if (key == 1)
+  if (key == 1){
     stabilize = !stabilize;
+    Serial.println(stabilize);
+  }
+
 
   if (key == 16 || key == 15)
   {
-    maxLimitMotor = map(value2, -32768, 32767, 0, 255);
+    
+
   }
 }
