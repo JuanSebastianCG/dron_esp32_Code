@@ -28,7 +28,7 @@ void setup()
   //wifiConnection("ANPARO..", "24280650", procesUdp);
   // wifiConnection("Sebas", "Vienna22*", procesUdp);
   // wifiConnection("AndroidAPB943", "vtqz9627", procesUdp);
-   wifiConnection("redjuan", "juan4321", procesUdp);
+  wifiConnection("redjuan", "juan4321", procesUdp);
 
   // ---------------Connect to MPU6050---------------
   warningLed(2);
@@ -71,6 +71,7 @@ void procesUdp(uint8_t key, int16_t value1, int16_t value2)
 {
   // Serial.println(key);
   //  Use UDP data to control balance
+  Serial.println(key);
   moveMotorsXbox(key, value1, value2);
   getAltitudeWanted(key, value1, value2);
   

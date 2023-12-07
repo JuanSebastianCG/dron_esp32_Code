@@ -170,7 +170,7 @@ void controllBalance(float y, float x)
     motorSpeed3 = 0;
     motorSpeed4 = 0;
   }
-   printf("Motor 1: %d, Motor 2: %d, Motor 3: %d, Motor 4: %d\n", motorSpeed1, motorSpeed2, motorSpeed3, motorSpeed4);
+  // printf("Motor 1: %d, Motor 2: %d, Motor 3: %d, Motor 4: %d\n", motorSpeed1, motorSpeed2, motorSpeed3, motorSpeed4);
 }
 
 void moveMotors()
